@@ -447,7 +447,6 @@ async function fetchWeather(cityKey = currentCity) {
         // 渲染頁面
         renderHero(transformed36h, cityKey);
         render3DayForecast(transformed3day);
-        updateHeaderDate();
         
         // 隱藏 loading，顯示主內容
         document.getElementById('loading').style.display = 'none';
