@@ -142,6 +142,53 @@ function transform36HourData(rawData) {
 }
 
 /**
+ * 從 36 小時預報資料生成替代的三日預報
+ * 當三日預報 API 失敗時使用
+ */
+function generate3DayFromFallback(data36h) {
+    const forecasts = data36h.forecasts;
+    const dailyForecasts = [];
+    const processedDates = new Set();
+    
+    forecasts.forEach((forecast, index) => {
+        const date = parseDateTime(forecast.startTime);
+        const dateKey = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+        
+        if (!processedDates.has(dateKey) && dailyForecasts.length < 3) {
+            processedDates.add(dateKey);
+            dailyForecasts.push({
+                date: forecast.startTime,
+                dateFormatted: formatDate(forecast.startTime),
+                weather: forecast.weather,
+                weatherCode: forecast.weatherCode,
+                minTemp: parseInt(forecast.minTemp),
+                maxTemp: parseInt(forecast.maxTemp),
+                rainProb: parseInt(forecast.rain),
+                comfort: forecast.comfort
+            });
+        }
+    });
+    
+    // 如果不足三天，複製最後一天的資料
+    while (dailyForecasts.length < 3 && dailyForecasts.length > 0) {
+        const lastDay = dailyForecasts[dailyForecasts.length - 1];
+        const nextDate = new Date(parseDateTime(lastDay.date));
+        nextDate.setDate(nextDate.getDate() + 1);
+        
+        dailyForecasts.push({
+            ...lastDay,
+            date: nextDate.toISOString(),
+            dateFormatted: formatDate(nextDate.toISOString())
+        });
+    }
+    
+    return {
+        city: data36h.city,
+        forecasts: dailyForecasts
+    };
+}
+
+/**
  * 轉換三日預報 API 資料
  * 取第一個行政區，按日期分組並計算每日極值
  */
@@ -391,8 +438,17 @@ async function fetchWeather(cityKey = currentCity) {
         const transformed36h = transform36HourData(data36h.data);
         
         let transformed3day = { forecasts: [] };
-        if (data3day.success) {
-            transformed3day = transform3DayData(data3day.data);
+        if (data3day.success && data3day.data) {
+            try {
+                transformed3day = transform3DayData(data3day.data);
+            } catch (e) {
+                console.warn("三日預報資料轉換失敗，使用替代方案", e);
+                transformed3day = generate3DayFromFallback(transformed36h);
+            }
+        } else {
+            // 三日預報 API 失敗，使用 36 小時資料生成替代
+            console.warn("三日預報 API 失敗，使用 36 小時資料替代");
+            transformed3day = generate3DayFromFallback(transformed36h);
         }
         
         // 渲染頁面

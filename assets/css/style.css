@@ -420,7 +420,7 @@ body {
    ============================================ */
 
 .forecast-section {
-    padding: 0 15px;
+    padding-top: 20px;
     width: 100%;
     box-sizing: border-box;
 }
