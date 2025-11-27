@@ -1,6 +1,48 @@
-const API_URL = "https://hex-cwa.zeabur.app/api/weather/kaohsiung";
+// ============================================
+// 森森天氣 - Japanese Magazine Kawaii Style
+// ============================================
 
-function getWeatherIcon(weather) {
+const API_BASE = "https://hex-cwa.zeabur.app/api";
+
+// 六都城市設定
+const CITIES = {
+    kaohsiung: { name: "高雄市", emoji: "🏙️" },
+    taipei: { name: "臺北市", emoji: "🗼" },
+    newtaipei: { name: "新北市", emoji: "🌉" },
+    taoyuan: { name: "桃園市", emoji: "✈️" },
+    taichung: { name: "臺中市", emoji: "🎡" },
+    tainan: { name: "臺南市", emoji: "🏯" }
+};
+
+// 當前選擇的城市
+let currentCity = "kaohsiung";
+
+// ============================================
+// 工具函式
+// ============================================
+
+/**
+ * 安全解析 API 時間格式（解決 Safari 相容性問題）
+ * "2025-11-26 06:00:00" → Date 物件
+ */
+function parseDateTime(str) {
+    if (!str) return new Date();
+    // 將空格替換為 T，確保 ISO 8601 格式
+    return new Date(str.replace(' ', 'T'));
+}
+
+/**
+ * 根據天氣代碼回傳圖片路徑
+ */
+function getWeatherImage(code) {
+    const paddedCode = String(code || '00').padStart(2, '0');
+    return `./assets/img/w${paddedCode}.jpg`;
+}
+
+/**
+ * 天氣描述轉換為 emoji
+ */
+function getWeatherEmoji(weather) {
     if (!weather) return "🌤️";
     if (weather.includes("晴")) return "☀️";
     if (weather.includes("多雲")) return "⛅";
@@ -10,6 +52,9 @@ function getWeatherIcon(weather) {
     return "🌤️";
 }
 
+/**
+ * 根據降雨機率和溫度生成建議
+ */
 function getAdvice(rainProb, maxTemp) {
     let rainIcon = "🌂";
     let rainText = "不用帶傘";
@@ -20,10 +65,11 @@ function getAdvice(rainProb, maxTemp) {
 
     let clothIcon = "👕";
     let clothText = "舒適穿搭";
-    if (parseInt(maxTemp) >= 28) {
+    const temp = parseInt(maxTemp);
+    if (temp >= 28) {
         clothIcon = "🎽";
-        clothText = "短袖出發";
-    } else if (parseInt(maxTemp) <= 20) {
+        clothText = "短袖涼爽";
+    } else if (temp <= 20) {
         clothIcon = "🧥";
         clothText = "加件外套";
     }
@@ -31,8 +77,11 @@ function getAdvice(rainProb, maxTemp) {
     return { rainIcon, rainText, clothIcon, clothText };
 }
 
+/**
+ * 時間轉換為時段描述
+ */
 function getTimePeriod(startTime) {
-    const hour = new Date(startTime).getHours();
+    const hour = parseDateTime(startTime).getHours();
     if (hour >= 5 && hour < 11) return "早晨";
     if (hour >= 11 && hour < 14) return "中午";
     if (hour >= 14 && hour < 18) return "下午";
@@ -40,101 +89,361 @@ function getTimePeriod(startTime) {
     return "深夜";
 }
 
-function renderWeather(data) {
-    const forecasts = data.forecasts;
-    const current = forecasts[0];
-    const others = forecasts.slice(1);
+/**
+ * 格式化日期為中文顯示
+ */
+function formatDate(date) {
+    const d = parseDateTime(date);
+    const month = d.getMonth() + 1;
+    const day = d.getDate();
+    const weekdays = ["週日", "週一", "週二", "週三", "週四", "週五", "週六"];
+    return `${month}/${day} ${weekdays[d.getDay()]}`;
+}
 
-    // 1. 渲染 Hero Card (主畫面)
-    const advice = getAdvice(current.rain, current.maxTemp);
-    const period = getTimePeriod(current.startTime);
+// ============================================
+// API 資料轉換函式
+// ============================================
+
+/**
+ * 轉換 36 小時預報 API 資料
+ * 從 weatherElement[] 多維陣列轉換為 forecasts[] 扁平結構
+ */
+function transform36HourData(rawData) {
+    const location = rawData.location;
+    const elements = location.weatherElement;
+    
+    // 建立 elementName → data 的映射
+    const elementMap = {};
+    elements.forEach(el => {
+        elementMap[el.elementName] = el.time;
+    });
+    
+    // 取得時段數量（以 Wx 為基準）
+    const timeCount = elementMap.Wx ? elementMap.Wx.length : 0;
+    const forecasts = [];
+    
+    for (let i = 0; i < timeCount; i++) {
+        forecasts.push({
+            startTime: elementMap.Wx[i].startTime,
+            endTime: elementMap.Wx[i].endTime,
+            weather: elementMap.Wx[i].parameter.parameterName,
+            weatherCode: elementMap.Wx[i].parameter.parameterValue,
+            rain: elementMap.PoP ? elementMap.PoP[i].parameter.parameterName : "0",
+            minTemp: elementMap.MinT ? elementMap.MinT[i].parameter.parameterName : "20",
+            maxTemp: elementMap.MaxT ? elementMap.MaxT[i].parameter.parameterName : "30",
+            comfort: elementMap.CI ? elementMap.CI[i].parameter.parameterName : "舒適"
+        });
+    }
+    
+    return {
+        city: rawData.city,
+        forecasts
+    };
+}
+
+/**
+ * 轉換三日預報 API 資料
+ * 取第一個行政區，按日期分組並計算每日極值
+ */
+function transform3DayData(rawData) {
+    // 取得第一個行政區的資料
+    const locations = rawData.locations;
+    const firstDistrict = locations.location[0];
+    const districtName = firstDistrict.locationName;
+    const elements = firstDistrict.weatherElement;
+    
+    // 建立 elementName → data 的映射
+    const elementMap = {};
+    elements.forEach(el => {
+        elementMap[el.elementName] = el.time;
+    });
+    
+    // 按日期分組
+    const dailyData = {};
+    const wxData = elementMap.Wx || [];
+    
+    wxData.forEach((item, index) => {
+        const date = parseDateTime(item.startTime);
+        const dateKey = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+        
+        if (!dailyData[dateKey]) {
+            dailyData[dateKey] = {
+                date: item.startTime,
+                weathers: [],
+                weatherCodes: [],
+                temps: [],
+                rains: [],
+                comforts: []
+            };
+        }
+        
+        // 收集天氣描述和代碼
+        if (item.elementValue && item.elementValue[0]) {
+            dailyData[dateKey].weathers.push(item.elementValue[0].value);
+            dailyData[dateKey].weatherCodes.push(item.elementValue[1]?.value || '00');
+        }
+        
+        // 收集溫度（MinT）
+        if (elementMap.MinT && elementMap.MinT[index]) {
+            const minT = elementMap.MinT[index].elementValue?.[0]?.value;
+            if (minT) dailyData[dateKey].temps.push(parseInt(minT));
+        }
+        
+        // 收集溫度（MaxT）
+        if (elementMap.MaxT && elementMap.MaxT[index]) {
+            const maxT = elementMap.MaxT[index].elementValue?.[0]?.value;
+            if (maxT) dailyData[dateKey].temps.push(parseInt(maxT));
+        }
+        
+        // 收集降雨機率
+        if (elementMap.PoP12h && elementMap.PoP12h[Math.floor(index / 4)]) {
+            const pop = elementMap.PoP12h[Math.floor(index / 4)].elementValue?.[0]?.value;
+            if (pop) dailyData[dateKey].rains.push(parseInt(pop));
+        }
+        
+        // 收集舒適度
+        if (elementMap.CI && elementMap.CI[index]) {
+            const ci = elementMap.CI[index].elementValue?.[0]?.value;
+            if (ci) dailyData[dateKey].comforts.push(ci);
+        }
+    });
+    
+    // 計算每日統計值
+    const dailyForecasts = Object.entries(dailyData)
+        .slice(0, 3) // 只取三天
+        .map(([key, data]) => {
+            const temps = data.temps.length > 0 ? data.temps : [25];
+            const rains = data.rains.length > 0 ? data.rains : [0];
+            
+            return {
+                date: data.date,
+                dateFormatted: formatDate(data.date),
+                weather: data.weathers[Math.floor(data.weathers.length / 2)] || "多雲",
+                weatherCode: data.weatherCodes[Math.floor(data.weatherCodes.length / 2)] || "04",
+                minTemp: Math.min(...temps),
+                maxTemp: Math.max(...temps),
+                rainProb: Math.max(...rains),
+                comfort: data.comforts[Math.floor(data.comforts.length / 2)] || "舒適"
+            };
+        });
+    
+    return {
+        city: rawData.city,
+        district: districtName,
+        forecasts: dailyForecasts
+    };
+}
+
+// ============================================
+// 渲染函式
+// ============================================
+
+/**
+ * 渲染 Hero 區塊（36 小時預報）
+ */
+function renderHero(data, cityKey) {
+    const heroSection = document.getElementById('heroSection');
+    const heroCard = document.getElementById('heroCard');
+    const current = data.forecasts[0];
+    
+    // 設定背景圖片
+    heroSection.style.backgroundImage = `url('./assets/img/bg-${cityKey}.jpeg')`;
+    
+    // 計算平均溫度
     const avgTemp = Math.round((parseInt(current.maxTemp) + parseInt(current.minTemp)) / 2);
+    const period = getTimePeriod(current.startTime);
+    const advice = getAdvice(current.rain, current.maxTemp);
+    
+    heroCard.innerHTML = `
+        <div class="hero-location">
+            <span class="location-emoji">${CITIES[cityKey].emoji}</span>
+            <span class="location-name">${CITIES[cityKey].name}</span>
+        </div>
+        
+        <div class="hero-period-badge">${period}</div>
+        
+        <div class="hero-main">
+            <div class="hero-temp-display">
+                <span class="hero-emoji">${getWeatherEmoji(current.weather)}</span>
+                <span class="hero-temp">${avgTemp}°</span>
+            </div>
+            <div class="hero-weather-desc">${current.weather}</div>
+            <div class="hero-temp-range">
+                <span>🌡️ ${current.minTemp}° ~ ${current.maxTemp}°</span>
+            </div>
+        </div>
+        
+        <div class="hero-comfort">
+            <span class="comfort-badge">😊 ${current.comfort}</span>
+        </div>
+        
+        <div class="hero-advice">
+            <div class="advice-card">
+                <span class="advice-icon">${advice.rainIcon}</span>
+                <span class="advice-text">${advice.rainText}</span>
+                <span class="advice-detail">💧 ${current.rain}%</span>
+            </div>
+            <div class="advice-card">
+                <span class="advice-icon">${advice.clothIcon}</span>
+                <span class="advice-text">${advice.clothText}</span>
+                <span class="advice-detail">🌡️ ${current.maxTemp}°</span>
+            </div>
+        </div>
+    `;
+}
 
-    document.getElementById('heroCard').innerHTML = `
-                <div class="hero-card">
-                    <div class="hero-period">${period}</div>
-                    <div class="hero-temp-container">
-                        <div class="hero-icon">${getWeatherIcon(current.weather)}</div>
-                        <div class="hero-temp">${avgTemp}°</div>
+/**
+ * 渲染三日預報
+ */
+function render3DayForecast(data) {
+    const grid = document.getElementById('forecastGrid');
+    
+    if (!data.forecasts || data.forecasts.length === 0) {
+        grid.innerHTML = '<p class="no-data">暫無預報資料</p>';
+        return;
+    }
+    
+    grid.innerHTML = data.forecasts.map((day, index) => {
+        const dayLabel = index === 0 ? '今天' : index === 1 ? '明天' : '後天';
+        const imgSrc = getWeatherImage(day.weatherCode);
+        
+        return `
+            <div class="forecast-card">
+                <div class="forecast-day">${dayLabel}</div>
+                <div class="forecast-date">${day.dateFormatted}</div>
+                
+                <div class="forecast-img-container">
+                    <img 
+                        src="${imgSrc}" 
+                        alt="${day.weather}"
+                        class="forecast-img"
+                        loading="lazy"
+                        onerror="this.onerror=null; this.src='./assets/img/w00.jpg';"
+                    />
+                </div>
+                
+                <div class="forecast-weather">
+                    <span class="weather-emoji">${getWeatherEmoji(day.weather)}</span>
+                    <span class="weather-text">${day.weather}</span>
+                </div>
+                
+                <div class="forecast-details">
+                    <div class="detail-row">
+                        <span class="detail-icon">🌡️</span>
+                        <span class="detail-label">溫度</span>
+                        <span class="detail-value">${day.minTemp}° ~ ${day.maxTemp}°</span>
                     </div>
-                    <div class="hero-desc">${current.weather}</div>
-                    
-                    <div class="advice-grid">
-                        <div class="advice-item">
-                            <div class="advice-icon">${advice.rainIcon}</div>
-                            <div class="advice-text">${advice.rainText}</div>
-                            <div style="font-size:0.7rem; color:#999">降雨率 ${current.rain}</div>
-                        </div>
-                        <div class="advice-item">
-                            <div class="advice-icon">${advice.clothIcon}</div>
-                            <div class="advice-text">${advice.clothText}</div>
-                            <div style="font-size:0.7rem; color:#999">最高溫 ${current.maxTemp}°</div>
-                        </div>
+                    <div class="detail-row">
+                        <span class="detail-icon">💧</span>
+                        <span class="detail-label">降雨</span>
+                        <span class="detail-value">${day.rainProb}%</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-icon">😊</span>
+                        <span class="detail-label">體感</span>
+                        <span class="detail-value">${day.comfort}</span>
                     </div>
                 </div>
-            `;
+            </div>
+        `;
+    }).join('');
+}
 
-    // 2. 渲染稍後預報 (包含明天判斷)
-    const scrollContainer = document.getElementById('futureForecasts');
-    scrollContainer.innerHTML = '';
-
-    // 抓今天的日期數字 (例如 24)
-    const todayDate = new Date().getDate();
-
-    others.forEach(f => {
-        let p = getTimePeriod(f.startTime);
-
-        // 判斷該預報的日期是否跟今天不同，不同就是明天
-        const fDate = new Date(f.startTime);
-        if (fDate.getDate() !== todayDate) {
-            p = "明天" + p;
-        }
-
-        scrollContainer.innerHTML += `
-                    <div class="mini-card">
-                        <div class="mini-time">${p}</div>
-                        <div class="mini-icon">${getWeatherIcon(f.weather)}</div>
-                        <div class="mini-temp">${f.minTemp}° - ${f.maxTemp}°</div>
-                        <div style="font-size:0.8rem; color:#888; margin-top:5px;">💧${f.rain}</div>
-                    </div>
-                `;
-    });
-
-    // 3. 右上角顯示今日日期
+/**
+ * 更新頁面日期顯示
+ */
+function updateHeaderDate() {
     const now = new Date();
     const month = now.getMonth() + 1;
     const date = now.getDate();
-    const dayIndex = now.getDay();
     const days = ["週日", "週一", "週二", "週三", "週四", "週五", "週六"];
-
-    document.getElementById('updateTime').textContent = `${month}月${date}日 ${days[dayIndex]}`;
+    document.getElementById('updateTime').textContent = `${month}月${date}日 ${days[now.getDay()]}`;
 }
 
-async function fetchWeather() {
+// ============================================
+// API 請求與主流程
+// ============================================
+
+/**
+ * 獲取天氣資料（同時請求 36 小時與三日預報）
+ */
+async function fetchWeather(cityKey = currentCity) {
     try {
-        // 1. 定義「最低等待時間」：1500 毫秒 (1.5秒)
+        // 顯示 loading
+        document.getElementById('loading').style.display = 'flex';
+        document.getElementById('mainContent').style.display = 'none';
+        
+        // 最低顯示 loading 1.5 秒
         const delayPromise = new Promise(resolve => setTimeout(resolve, 1500));
-
-        // 2. 定義「抓取資料」的工作
-        const fetchPromise = fetch(API_URL).then(res => res.json());
-
-        // 3. Promise.all 會等待「兩個都完成」才會往下走
-        // result 陣列裡，第一個是 delay 的結果(沒用到)，第二個是 api 的 json 資料
-        const [_, json] = await Promise.all([delayPromise, fetchPromise]);
-
-        if (json.success) {
-            renderWeather(json.data);
-
-            // 資料處理好後，隱藏 Loading，顯示主畫面
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('mainContent').style.display = 'block';
-        } else {
-            throw new Error("API Error");
+        
+        // 同時請求兩個 API
+        const fetch36h = fetch(`${API_BASE}/weather/${cityKey}`).then(res => res.json());
+        const fetch3day = fetch(`${API_BASE}/weather/3day/${cityKey}`).then(res => res.json());
+        
+        // 等待所有請求完成
+        const [_, data36h, data3day] = await Promise.all([delayPromise, fetch36h, fetch3day]);
+        
+        if (!data36h.success) {
+            throw new Error("36小時預報 API 錯誤");
         }
+        
+        // 轉換資料格式
+        const transformed36h = transform36HourData(data36h.data);
+        
+        let transformed3day = { forecasts: [] };
+        if (data3day.success) {
+            transformed3day = transform3DayData(data3day.data);
+        }
+        
+        // 渲染頁面
+        renderHero(transformed36h, cityKey);
+        render3DayForecast(transformed3day);
+        updateHeaderDate();
+        
+        // 隱藏 loading，顯示主內容
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('mainContent').style.display = 'block';
+        
     } catch (e) {
         console.error(e);
-        alert("天氣資料讀取失敗，狸克把網路線咬斷了！");
+        alert("天氣資料讀取失敗，狸克把網路線咬斷了！🦝");
+        document.getElementById('loading').style.display = 'none';
     }
 }
 
-document.addEventListener("DOMContentLoaded", fetchWeather);
+/**
+ * 切換城市
+ */
+function switchCity(cityKey) {
+    if (cityKey === currentCity) return;
+    
+    currentCity = cityKey;
+    
+    // 更新按鈕狀態
+    document.querySelectorAll('.city-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.city === cityKey);
+    });
+    
+    // 重新載入資料
+    fetchWeather(cityKey);
+}
+
+/**
+ * 初始化城市選擇器事件
+ */
+function initCitySelector() {
+    document.querySelectorAll('.city-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            switchCity(btn.dataset.city);
+        });
+    });
+}
+
+// ============================================
+// 頁面初始化
+// ============================================
+
+document.addEventListener("DOMContentLoaded", () => {
+    initCitySelector();
+    fetchWeather(currentCity);
+});
