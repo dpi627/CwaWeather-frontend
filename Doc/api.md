@@ -5,7 +5,7 @@
 ## Base URL
 
 ```
-http://localhost:3000
+https://hex-cwa.zeabur.app/
 ```
 
 ## 支援城市（六都）
