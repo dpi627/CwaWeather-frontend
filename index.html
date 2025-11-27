@@ -84,6 +84,51 @@
 
     </div>
 
+    <!-- Playground Modal -->
+    <div id="playgroundModal" class="playground-modal">
+        <div class="playground-backdrop"></div>
+        <div class="playground-container">
+            <!-- 關閉按鈕 -->
+            <button class="playground-close" aria-label="關閉">✕</button>
+            
+            <!-- 上方預覽區（21:9 比例） -->
+            <div class="playground-preview">
+                <img class="playground-bg" id="playgroundBg" src="./assets/img/bg-taipei.jpeg" alt="City Background">
+                <div class="playground-overlay"></div>
+                <div class="playground-center">
+                    <!-- 左側：寶可夢圓框（較大） -->
+                    <div class="pg-pokemon-frame">
+                        <img id="pgPokemonImg" src="./assets/img/w01.jpg" alt="Pokemon" onerror="this.onerror=null; this.src='./assets/img/w00.jpg';">
+                    </div>
+                    <!-- 右側：天氣圖示 + 文字 -->
+                    <div class="pg-weather-info">
+                        <div class="pg-weather-emoji" id="pgWeatherEmoji">☀️</div>
+                        <div class="pg-weather-text" id="pgWeatherText">晴天</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 下方控制區 -->
+            <div class="playground-controls">
+                <!-- 左側：城市選擇 -->
+                <div class="pg-cities">
+                    <h3 class="pg-section-title">🏙️ 選擇城市</h3>
+                    <div class="pg-city-grid" id="pgCityGrid">
+                        <!-- 六都按鈕由 JS 動態生成 -->
+                    </div>
+                </div>
+                
+                <!-- 右側：天氣圖示選擇 -->
+                <div class="pg-weathers">
+                    <h3 class="pg-section-title">☀️ 選擇天氣</h3>
+                    <div class="pg-weather-grid" id="pgWeatherGrid">
+                        <!-- 天氣圖示由 JS 動態生成 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="./assets/js/app.js"></script>
 </body>
 

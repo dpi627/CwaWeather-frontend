@@ -18,6 +18,53 @@ const CITIES = {
 let currentCity = "taipei";
 
 // ============================================
+// Playground 設定
+// ============================================
+
+// 可用的天氣代碼
+const WEATHER_CODES = ['01', '02', '03', '04', '05', '06', '07', '08', '11', '15', '18', '19'];
+
+// 天氣代碼對應文字
+const WEATHER_TEXT_MAP = {
+    '01': '晴天',
+    '02': '晴時多雲',
+    '03': '多雲時晴',
+    '04': '多雲',
+    '05': '多雲時陰',
+    '06': '陰時多雲',
+    '07': '陰天',
+    '08': '短暫雨',
+    '11': '陰短暫雨',
+    '15': '雷陣雨',
+    '18': '午後雷陣雨',
+    '19': '晴午後多雲短暫雨',
+    '00': '未知天氣'
+};
+
+// 天氣代碼對應 emoji
+const WEATHER_EMOJI_MAP = {
+    '01': '☀️',
+    '02': '🌤️',
+    '03': '⛅',
+    '04': '🌥️',
+    '05': '🌥️',
+    '06': '☁️',
+    '07': '☁️',
+    '08': '🌧️',
+    '11': '🌧️',
+    '15': '⛈️',
+    '18': '⛈️',
+    '19': '🌦️',
+    '00': '🌤️'
+};
+
+// Playground 當前狀態
+let playgroundState = {
+    city: 'taipei',
+    weatherCode: '01'
+};
+
+// ============================================
 // 工具函式
 // ============================================
 
@@ -372,13 +419,14 @@ function render3DayForecast(data) {
     grid.innerHTML = data.forecasts.map((day, index) => {
         const dayLabel = index === 0 ? '今天' : index === 1 ? '明天' : '後天';
         const imgSrc = getWeatherImage(day.weatherCode);
+        const paddedCode = String(day.weatherCode || '00').padStart(2, '0');
         
         return `
             <div class="forecast-card">
                 <div class="forecast-day">${dayLabel}</div>
                 <div class="forecast-date">${day.dateFormatted}</div>
                 
-                <div class="forecast-img-container">
+                <div class="forecast-img-container" title="Playground" data-weather-code="${paddedCode}" onclick="openPlayground('${paddedCode}')">
                     <img 
                         src="${imgSrc}" 
                         alt="${day.weather}"
@@ -514,10 +562,157 @@ function initCitySelector() {
 }
 
 // ============================================
+// Playground 功能
+// ============================================
+
+/**
+ * 初始化 Playground
+ */
+function initPlayground() {
+    const modal = document.getElementById('playgroundModal');
+    const closeBtn = modal.querySelector('.playground-close');
+    const backdrop = modal.querySelector('.playground-backdrop');
+    
+    // 關閉按鈕
+    closeBtn.addEventListener('click', closePlayground);
+    
+    // 點擊遮罩關閉
+    backdrop.addEventListener('click', closePlayground);
+    
+    // ESC 鍵關閉
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('active')) {
+            closePlayground();
+        }
+    });
+    
+    // 渲染城市和天氣選擇器
+    renderPlaygroundCities();
+    renderPlaygroundWeathers();
+}
+
+/**
+ * 開啟 Playground
+ * @param {string} weatherCode - 天氣代碼
+ */
+function openPlayground(weatherCode) {
+    const modal = document.getElementById('playgroundModal');
+    
+    // 設定初始狀態：當前城市 + 點擊的天氣
+    playgroundState.city = currentCity;
+    playgroundState.weatherCode = weatherCode || '01';
+    
+    // 更新預覽區
+    updatePlaygroundCity(playgroundState.city);
+    updatePlaygroundWeather(playgroundState.weatherCode);
+    
+    // 更新按鈕 active 狀態
+    updatePlaygroundActiveStates();
+    
+    // 顯示 modal
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden'; // 防止背景滾動
+}
+
+/**
+ * 關閉 Playground
+ */
+function closePlayground() {
+    const modal = document.getElementById('playgroundModal');
+    modal.classList.remove('active');
+    document.body.style.overflow = ''; // 恢復滾動
+}
+
+/**
+ * 更新 Playground 城市背景
+ * @param {string} cityKey - 城市 key
+ */
+function updatePlaygroundCity(cityKey) {
+    playgroundState.city = cityKey;
+    const bgImg = document.getElementById('playgroundBg');
+    bgImg.src = `./assets/img/bg-${cityKey}.jpeg`;
+    updatePlaygroundActiveStates();
+}
+
+/**
+ * 更新 Playground 天氣資訊
+ * @param {string} code - 天氣代碼
+ */
+function updatePlaygroundWeather(code) {
+    playgroundState.weatherCode = code;
+    const paddedCode = String(code).padStart(2, '0');
+    
+    // 更新寶可夢圖片
+    document.getElementById('pgPokemonImg').src = `./assets/img/w${paddedCode}.jpg`;
+    
+    // 更新天氣 emoji
+    document.getElementById('pgWeatherEmoji').textContent = WEATHER_EMOJI_MAP[paddedCode] || WEATHER_EMOJI_MAP['00'];
+    
+    // 更新天氣文字
+    document.getElementById('pgWeatherText').textContent = WEATHER_TEXT_MAP[paddedCode] || WEATHER_TEXT_MAP['00'];
+    
+    updatePlaygroundActiveStates();
+}
+
+/**
+ * 更新 Playground 按鈕 active 狀態
+ */
+function updatePlaygroundActiveStates() {
+    // 城市按鈕
+    document.querySelectorAll('.pg-city-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.city === playgroundState.city);
+    });
+    
+    // 天氣按鈕
+    document.querySelectorAll('.pg-weather-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.code === playgroundState.weatherCode);
+    });
+}
+
+/**
+ * 渲染 Playground 城市按鈕
+ */
+function renderPlaygroundCities() {
+    const grid = document.getElementById('pgCityGrid');
+    
+    grid.innerHTML = Object.entries(CITIES).map(([key, city]) => `
+        <button class="pg-city-btn" data-city="${key}">${city.name}</button>
+    `).join('');
+    
+    // 綁定點擊事件
+    grid.querySelectorAll('.pg-city-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            updatePlaygroundCity(btn.dataset.city);
+        });
+    });
+}
+
+/**
+ * 渲染 Playground 天氣圖示
+ */
+function renderPlaygroundWeathers() {
+    const grid = document.getElementById('pgWeatherGrid');
+    
+    grid.innerHTML = WEATHER_CODES.map(code => `
+        <button class="pg-weather-btn" data-code="${code}" title="${WEATHER_TEXT_MAP[code] || ''}">
+            <img src="./assets/img/w${code}.jpg" alt="${WEATHER_TEXT_MAP[code] || ''}" onerror="this.onerror=null; this.src='./assets/img/w00.jpg';">
+        </button>
+    `).join('');
+    
+    // 綁定點擊事件
+    grid.querySelectorAll('.pg-weather-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            updatePlaygroundWeather(btn.dataset.code);
+        });
+    });
+}
+
+// ============================================
 // 頁面初始化
 // ============================================
 
 document.addEventListener("DOMContentLoaded", () => {
     initCitySelector();
+    initPlayground();
     fetchWeather(currentCity);
 });
