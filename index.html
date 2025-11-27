@@ -28,7 +28,7 @@
     <!-- Main Content -->
     <div id="mainContent" class="main-content" style="display: none;">
         
-        <!-- Header with Date -->
+        <!-- Header with Date (覆蓋在 Hero 上方) -->
         <header class="header">
             <div class="header-date">
                 <span class="header-icon">🌸</span>
@@ -37,7 +37,15 @@
             <h1 class="header-title">森森天氣</h1>
         </header>
 
-        <!-- City Selector - Horizontal Scroll -->
+        <!-- Hero Section - 36 Hour Forecast (移至最上方，滿版無圓角) -->
+        <section id="heroSection" class="hero-section">
+            <div class="hero-overlay"></div>
+            <div class="hero-content" id="heroCard">
+                <!-- Dynamic content loaded by JS -->
+            </div>
+        </section>
+
+        <!-- City Selector - Horizontal Scroll (移至 Hero 下方) -->
         <nav class="city-selector">
             <div class="city-scroll">
                 <button class="city-btn active" data-city="kaohsiung">
@@ -66,14 +74,6 @@
                 </button>
             </div>
         </nav>
-
-        <!-- Hero Section - 36 Hour Forecast -->
-        <section id="heroSection" class="hero-section">
-            <div class="hero-overlay"></div>
-            <div class="hero-content" id="heroCard">
-                <!-- Dynamic content loaded by JS -->
-            </div>
-        </section>
 
         <!-- 3-Day Forecast Section -->
         <section class="forecast-section">
