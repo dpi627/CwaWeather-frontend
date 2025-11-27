@@ -20,7 +20,7 @@ description: This prompt is used to create a commit message for changes made to 
   - perf: ⚡️
   - test: 🔧
   - chore: 🪣
-- commit message
+- do commit with message
 
 ```sh
 git commit -m "<type>(<scope>): <emoji> <description>"
