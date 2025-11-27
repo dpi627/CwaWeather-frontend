@@ -1,4 +1,4 @@
-# 森森天氣 - Copilot Instructions
+# 寶可天氣 - Copilot Instructions
 
 ## 專案概述
 
