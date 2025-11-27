@@ -312,12 +312,34 @@ body {
     line-height: 1;
 }
 
+.hero-info-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 10px;
+}
+
 .hero-weather-desc {
     font-size: 1.3rem;
     font-weight: 700;
     color: var(--kawaii-white);
-    margin-top: 10px;
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.hero-date-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: var(--radius-md);
+    padding: 6px 14px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    box-shadow: var(--shadow-soft);
 }
 
 /* 右側：詳細資訊 */
@@ -927,8 +949,18 @@ body {
         font-size: 2.2rem;
     }
     
+    .hero-info-row {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
     .hero-weather-desc {
         font-size: 1rem;
+    }
+    
+    .hero-date-badge {
+        padding: 5px 10px;
+        font-size: 0.85rem;
     }
     
     .hero-right {

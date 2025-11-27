@@ -100,6 +100,18 @@ function formatDate(date) {
     return `${month}/${day} ${weekdays[d.getDay()]}`;
 }
 
+/**
+ * 格式化日期為簡短顯示（用於 Hero 區塊）
+ * 輸出格式：11/27(四)
+ */
+function formatShortDate(date) {
+    const d = parseDateTime(date);
+    const month = d.getMonth() + 1;
+    const day = d.getDate();
+    const weekdays = ["日", "一", "二", "三", "四", "五", "六"];
+    return `${month}/${day}(${weekdays[d.getDay()]})`;
+}
+
 // ============================================
 // API 資料轉換函式
 // ============================================
@@ -309,7 +321,10 @@ function renderHero(data, cityKey) {
                     <span class="hero-emoji">${getWeatherEmoji(current.weather)}</span>
                     <span class="hero-temp">${avgTemp}°</span>
                 </div>
-                <div class="hero-weather-desc">${current.weather}</div>
+                <div class="hero-info-row">
+                    <div class="hero-weather-desc">${current.weather}</div>
+                    <div class="hero-date-badge">${formatShortDate(current.startTime)}</div>
+                </div>
             </div>
             
             <!-- 右側：詳細資訊 -->
