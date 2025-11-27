@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>森森天氣</title>
+    <title>台灣六都天氣預報</title>
     <link rel="icon" type="image/png" href="./assets/img/icon.png">
     <link rel="apple-touch-icon" href="./assets/img/icon.png">
     <link rel="apple-touch-icon" sizes="180x180" href="./assets/img/icon.png">
@@ -28,26 +28,15 @@
     <!-- Main Content -->
     <div id="mainContent" class="main-content" style="display: none;">
         
-        <!-- Header with Date (覆蓋在 Hero 上方) -->
+        <!-- Header with Date and City Selector -->
         <header class="header">
-            <div class="header-date">
-                <span class="header-icon">🌸</span>
-                <span id="updateTime">載入中...</span>
+            <div class="header-top">
+                <div class="header-date">
+                    <span class="header-icon">🌸</span>
+                    <span id="updateTime">載入中...</span>
+                </div>
             </div>
-            <h1 class="header-title">森森天氣</h1>
-        </header>
-
-        <!-- Hero Section - 36 Hour Forecast (移至最上方，滿版無圓角) -->
-        <section id="heroSection" class="hero-section">
-            <div class="hero-overlay"></div>
-            <div class="hero-content" id="heroCard">
-                <!-- Dynamic content loaded by JS -->
-            </div>
-        </section>
-
-        <!-- City Selector - Horizontal Scroll (移至 Hero 下方) -->
-        <nav class="city-selector">
-            <div class="city-scroll">
+            <nav class="header-cities">
                 <button class="city-btn" data-city="taipei">
                     <span class="city-emoji">🗼</span>
                     <span class="city-name">臺北市</span>
@@ -72,8 +61,16 @@
                     <span class="city-emoji">🏙️</span>
                     <span class="city-name">高雄市</span>
                 </button>
+            </nav>
+        </header>
+
+        <!-- Hero Section - 36 Hour Forecast (移至最上方，滿版無圓角) -->
+        <section id="heroSection" class="hero-section">
+            <div class="hero-overlay"></div>
+            <div class="hero-content" id="heroCard">
+                <!-- Dynamic content loaded by JS -->
             </div>
-        </nav>
+        </section>
 
         <!-- 3-Day Forecast Section -->
         <section class="forecast-section">

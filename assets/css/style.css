@@ -138,7 +138,7 @@ body {
    ============================================ */
 
 .header {
-    padding: 12px 20px;
+    padding: 8px 15px 10px;
     text-align: center;
     background: rgba(255, 255, 255, 0.3);
     backdrop-filter: blur(10px);
@@ -150,6 +150,10 @@ body {
     z-index: 100;
     width: 100%;
     box-sizing: border-box;
+}
+
+.header-top {
+    margin-bottom: 8px;
 }
 
 .header-date {
@@ -169,77 +173,58 @@ body {
     font-size: 0.9rem;
 }
 
-.header-title {
-    font-size: 1.4rem;
-    font-weight: 900;
-    color: var(--text-dark);
-    margin-top: 6px;
-    letter-spacing: 2px;
-}
-
-/* ============================================
-   City Selector - Horizontal Scroll
-   ============================================ */
-
-.city-selector {
-    padding: 15px 10px;
-    overflow: hidden;
-    width: 100%;
-    box-sizing: border-box;
-    background: rgba(255, 255, 255, 0.2);
-}
-
-.city-scroll {
+.header-cities {
     display: flex;
-    gap: 12px;
+    gap: 8px;
     overflow-x: auto;
-    padding: 10px 10px;
+    padding: 5px 0;
     scrollbar-width: none;
     -ms-overflow-style: none;
-    scroll-snap-type: x mandatory;
     justify-content: center;
 }
 
-.city-scroll::-webkit-scrollbar {
+.header-cities::-webkit-scrollbar {
     display: none;
 }
+
+/* ============================================
+   City Buttons (in Header)
+   ============================================ */
 
 .city-btn {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
-    padding: 12px 20px;
+    gap: 2px;
+    padding: 6px 12px;
     background: rgba(255, 255, 255, 0.7);
-    border: 3px solid transparent;
-    border-radius: var(--radius-lg);
+    border: 2px solid transparent;
+    border-radius: var(--radius-md);
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     flex-shrink: 0;
-    scroll-snap-align: start;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
 }
 
 .city-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-medium);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-soft);
     background: rgba(255, 255, 255, 0.9);
 }
 
 .city-btn.active {
     background: var(--kawaii-white);
     border-color: var(--kawaii-pink);
-    box-shadow: var(--shadow-medium), 0 0 0 4px rgba(255, 181, 197, 0.3);
-    transform: scale(1.05);
+    box-shadow: var(--shadow-soft), 0 0 0 2px rgba(255, 181, 197, 0.3);
 }
 
 .city-emoji {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
 }
 
 .city-name {
-    font-size: 0.85rem;
+    font-size: 0.7rem;
     font-weight: 700;
     color: var(--text-dark);
     white-space: nowrap;
@@ -277,7 +262,7 @@ body {
 .hero-content {
     position: relative;
     z-index: 1;
-    padding: 80px 25px 25px;
+    padding: 100px 25px 25px;
     display: flex;
     flex-direction: column;
     min-height: 380px;
@@ -590,11 +575,23 @@ body {
     }
     
     .header {
-        padding: 14px 25px;
+        padding: 10px 20px 12px;
     }
     
-    .header-title {
-        font-size: 1.6rem;
+    .header-cities {
+        gap: 10px;
+    }
+    
+    .city-btn {
+        padding: 8px 14px;
+    }
+    
+    .city-emoji {
+        font-size: 1.3rem;
+    }
+    
+    .city-name {
+        font-size: 0.75rem;
     }
     
     .hero-section {
@@ -602,7 +599,7 @@ body {
     }
     
     .hero-content {
-        padding: 90px 30px 30px;
+        padding: 110px 30px 30px;
         max-width: 700px;
         margin: 0 auto;
     }
@@ -633,10 +630,6 @@ body {
         width: 120px;
         height: 120px;
     }
-    
-    .city-selector {
-        padding: 18px 15px;
-    }
 }
 
 /* ============================================
@@ -653,6 +646,7 @@ body {
     }
     
     .hero-content {
+        padding: 115px 35px 35px;
         max-width: 800px;
     }
     
@@ -676,11 +670,7 @@ body {
     }
     
     .header {
-        padding: 16px 30px;
-    }
-    
-    .header-title {
-        font-size: 1.8rem;
+        padding: 12px 30px 14px;
     }
     
     .header-date {
@@ -688,20 +678,20 @@ body {
         font-size: 0.85rem;
     }
     
-    .city-selector {
-        padding: 20px 15px;
+    .header-cities {
+        gap: 12px;
     }
     
     .city-btn {
-        padding: 14px 24px;
+        padding: 10px 18px;
     }
     
     .city-emoji {
-        font-size: 1.8rem;
+        font-size: 1.5rem;
     }
     
     .city-name {
-        font-size: 1rem;
+        font-size: 0.85rem;
     }
     
     .hero-section {
@@ -709,7 +699,7 @@ body {
     }
     
     .hero-content {
-        padding: 100px 40px 40px;
+        padding: 120px 40px 40px;
         max-width: 900px;
     }
     
@@ -766,11 +756,11 @@ body {
 
 @media (max-width: 360px) {
     .header {
-        padding: 10px 10px;
+        padding: 6px 8px 8px;
     }
     
-    .header-title {
-        font-size: 1.2rem;
+    .header-top {
+        margin-bottom: 6px;
     }
     
     .header-date {
@@ -778,12 +768,28 @@ body {
         font-size: 0.7rem;
     }
     
+    .header-cities {
+        gap: 6px;
+    }
+    
+    .city-btn {
+        padding: 4px 8px;
+    }
+    
+    .city-emoji {
+        font-size: 1rem;
+    }
+    
+    .city-name {
+        font-size: 0.6rem;
+    }
+    
     .hero-section {
         min-height: 340px;
     }
     
     .hero-content {
-        padding: 70px 15px 15px;
+        padding: 90px 15px 15px;
     }
     
     .hero-temp {
@@ -817,15 +823,6 @@ body {
     
     .advice-text {
         font-size: 0.9rem;
-    }
-    
-    .city-selector {
-        padding: 10px 5px;
-    }
-    
-    .city-scroll {
-        gap: 8px;
-        justify-content: flex-start;
     }
     
     .forecast-section {
@@ -873,18 +870,6 @@ body {
         font-size: 0.75rem;
     }
     
-    .city-btn {
-        padding: 8px 12px;
-    }
-    
-    .city-emoji {
-        font-size: 1.2rem;
-    }
-    
-    .city-name {
-        font-size: 0.7rem;
-    }
-    
     .footer {
         padding: 20px 15px;
         font-size: 0.75rem;
@@ -897,12 +882,11 @@ body {
 
 @media (max-width: 320px) {
     .header {
-        padding: 8px 8px;
+        padding: 5px 5px 6px;
     }
     
-    .header-title {
-        font-size: 1.1rem;
-        margin-top: 4px;
+    .header-top {
+        margin-bottom: 4px;
     }
     
     .header-date {
@@ -911,8 +895,24 @@ body {
         gap: 4px;
     }
     
+    .header-cities {
+        gap: 4px;
+    }
+    
+    .city-btn {
+        padding: 3px 6px;
+    }
+    
+    .city-emoji {
+        font-size: 0.9rem;
+    }
+    
+    .city-name {
+        font-size: 0.55rem;
+    }
+    
     .hero-content {
-        padding: 65px 10px 15px;
+        padding: 85px 10px 15px;
     }
     
     .hero-temp {
@@ -934,9 +934,5 @@ body {
     
     .forecast-card {
         padding: 10px 4px;
-    }
-    
-    .city-btn {
-        padding: 6px 10px;
     }
 }

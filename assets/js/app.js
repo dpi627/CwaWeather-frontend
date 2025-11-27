@@ -302,13 +302,6 @@ function renderHero(data, cityKey) {
     const advice = getAdvice(current.rain, current.maxTemp);
     
     heroCard.innerHTML = `
-        <div class="hero-location">
-            <span class="location-emoji">${CITIES[cityKey].emoji}</span>
-            <span class="location-name">${CITIES[cityKey].name}</span>
-        </div>
-        
-        <div class="hero-period-badge">${period}</div>
-        
         <div class="hero-main">
             <div class="hero-temp-display">
                 <span class="hero-emoji">${getWeatherEmoji(current.weather)}</span>
