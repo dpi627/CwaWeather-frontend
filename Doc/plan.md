@@ -1,4 +1,4 @@
-# 森森天氣 UI 全面重構計畫
+# 寶可天氣 UI 全面重構計畫
 
 ## Japanese Magazine Kawaii Style
 

@@ -1,5 +1,5 @@
 // ============================================
-// 森森天氣 - Japanese Magazine Kawaii Style
+// 寶可天氣 - Japanese Magazine Kawaii Style
 // ============================================
 
 const API_BASE = "https://hex-cwa.zeabur.app/api";
