@@ -302,31 +302,42 @@ function renderHero(data, cityKey) {
     const advice = getAdvice(current.rain, current.maxTemp);
     
     heroCard.innerHTML = `
-        <div class="hero-main">
-            <div class="hero-temp-display">
-                <span class="hero-emoji">${getWeatherEmoji(current.weather)}</span>
-                <span class="hero-temp">${avgTemp}°</span>
+        <div class="hero-layout">
+            <!-- 左側：主要天氣資訊 -->
+            <div class="hero-left">
+                <div class="hero-temp-display">
+                    <span class="hero-emoji">${getWeatherEmoji(current.weather)}</span>
+                    <span class="hero-temp">${avgTemp}°</span>
+                </div>
+                <div class="hero-weather-desc">${current.weather}</div>
             </div>
-            <div class="hero-weather-desc">${current.weather}</div>
-            <div class="hero-temp-range">
-                <span>🌡️ ${current.minTemp}° ~ ${current.maxTemp}°</span>
-            </div>
-        </div>
-        
-        <div class="hero-comfort">
-            <span class="comfort-badge">😊 ${current.comfort}</span>
-        </div>
-        
-        <div class="hero-advice">
-            <div class="advice-card">
-                <span class="advice-icon">${advice.rainIcon}</span>
-                <span class="advice-text">${advice.rainText}</span>
-                <span class="advice-detail">💧 ${current.rain}%</span>
-            </div>
-            <div class="advice-card">
-                <span class="advice-icon">${advice.clothIcon}</span>
-                <span class="advice-text">${advice.clothText}</span>
-                <span class="advice-detail">🌡️ ${current.maxTemp}°</span>
+            
+            <!-- 右側：詳細資訊 -->
+            <div class="hero-right">
+                <!-- 右側上方：高低溫 + 舒適度 -->
+                <div class="hero-right-top">
+                    <div class="hero-temp-range">
+                        <span class="range-icon">🌡️</span>
+                        <span class="range-value">${current.minTemp}° ~ ${current.maxTemp}°</span>
+                    </div>
+                    <div class="hero-comfort">
+                        <span class="comfort-badge">😊 ${current.comfort}</span>
+                    </div>
+                </div>
+                
+                <!-- 右側下方：降雨率 + 穿搭建議 -->
+                <div class="hero-right-bottom">
+                    <div class="advice-card">
+                        <span class="advice-icon">${advice.rainIcon}</span>
+                        <span class="advice-text">${advice.rainText}</span>
+                        <span class="advice-detail">💧 ${current.rain}%</span>
+                    </div>
+                    <div class="advice-card">
+                        <span class="advice-icon">${advice.clothIcon}</span>
+                        <span class="advice-text">${advice.clothText}</span>
+                        <span class="advice-detail">🌡️ ${current.maxTemp}°</span>
+                    </div>
+                </div>
             </div>
         </div>
     `;

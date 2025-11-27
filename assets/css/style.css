@@ -268,48 +268,28 @@ body {
     min-height: 380px;
 }
 
-.hero-location {
-    display: inline-flex;
+/* ============================================
+   Hero 左右兩欄排版
+   ============================================ */
+
+.hero-layout {
+    display: flex;
+    flex-direction: row;
     align-items: center;
-    gap: 8px;
-    background: rgba(255, 255, 255, 0.95);
-    padding: 8px 18px;
-    border-radius: 25px;
-    align-self: flex-start;
-    box-shadow: var(--shadow-soft);
+    justify-content: space-between;
+    gap: 20px;
+    flex: 1;
+    width: 100%;
 }
 
-.location-emoji {
-    font-size: 1.2rem;
-}
-
-.location-name {
-    font-size: 1rem;
-    font-weight: 800;
-    color: var(--text-dark);
-}
-
-.hero-period-badge {
-    display: inline-block;
-    background: var(--kawaii-lavender);
-    color: var(--kawaii-white);
-    padding: 6px 16px;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 700;
-    margin-top: 15px;
-    align-self: flex-start;
-    box-shadow: var(--shadow-soft);
-}
-
-.hero-main {
+/* 左側：主要天氣資訊 */
+.hero-left {
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
-    padding: 20px 0;
 }
 
 .hero-temp-display {
@@ -319,13 +299,13 @@ body {
 }
 
 .hero-emoji {
-    font-size: 4rem;
+    font-size: 3.5rem;
     filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
     animation: float 3s ease-in-out infinite;
 }
 
 .hero-temp {
-    font-size: 5rem;
+    font-size: 4.5rem;
     font-weight: 900;
     color: var(--kawaii-white);
     text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
@@ -333,52 +313,93 @@ body {
 }
 
 .hero-weather-desc {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     font-weight: 700;
     color: var(--kawaii-white);
     margin-top: 10px;
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
-.hero-temp-range {
-    margin-top: 8px;
-    font-size: 1rem;
-    color: rgba(255, 255, 255, 0.9);
-    background: rgba(255, 255, 255, 0.2);
-    padding: 6px 16px;
-    border-radius: 20px;
-    backdrop-filter: blur(10px);
-}
-
-.hero-comfort {
-    text-align: center;
-    margin-bottom: 15px;
-}
-
-.comfort-badge {
-    display: inline-block;
-    background: rgba(255, 255, 255, 0.9);
-    color: var(--text-dark);
-    padding: 8px 20px;
-    border-radius: 25px;
-    font-size: 1rem;
-    font-weight: 700;
-    box-shadow: var(--shadow-soft);
-}
-
-.hero-advice {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+/* 右側：詳細資訊 */
+.hero-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
     gap: 12px;
 }
 
+/* 右側上方：高低溫 + 舒適度 */
+.hero-right-top {
+    display: flex;
+    gap: 10px;
+}
+
+.hero-temp-range {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.6);
+    padding: 10px 12px;
+    border-radius: var(--radius-md);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-soft);
+}
+
+.range-icon {
+    font-size: 1rem;
+}
+
+.range-value {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.hero-comfort {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.comfort-badge {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.6);
+    color: var(--text-dark);
+    padding: 10px 12px;
+    border-radius: var(--radius-md);
+    font-size: 0.85rem;
+    font-weight: 700;
+    box-shadow: var(--shadow-soft);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+/* 右側下方：降雨率 + 穿搭建議（半透明） */
+.hero-right-bottom {
+    display: flex;
+    gap: 10px;
+}
+
 .advice-card {
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: 4px;
-    background: rgba(255, 255, 255, 0.9);
-    padding: 15px;
+    background: rgba(255, 255, 255, 0.6);
+    padding: 12px 10px;
     border-radius: var(--radius-md);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
@@ -386,18 +407,18 @@ body {
 }
 
 .advice-icon {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
 }
 
 .advice-text {
-    font-size: 1.1rem;
+    font-size: 0.95rem;
     font-weight: 800;
     color: var(--text-dark);
 }
 
 .advice-detail {
-    font-size: 0.8rem;
-    color: var(--text-light);
+    font-size: 0.75rem;
+    color: var(--text-medium);
 }
 
 /* ============================================
@@ -571,6 +592,19 @@ body {
     .weather-text {
         font-size: 0.9rem;
     }
+    
+    /* Hero 兩欄佈局增強 */
+    .hero-temp {
+        font-size: 5rem;
+    }
+    
+    .hero-emoji {
+        font-size: 4rem;
+    }
+    
+    .hero-weather-desc {
+        font-size: 1.4rem;
+    }
 }
 
 @media (min-width: 768px) {
@@ -609,12 +643,51 @@ body {
         margin: 0 auto;
     }
     
+    /* Hero 兩欄佈局 - 平板版 */
+    .hero-layout {
+        gap: 30px;
+    }
+    
     .hero-temp {
         font-size: 6rem;
     }
     
     .hero-emoji {
         font-size: 5rem;
+    }
+    
+    .hero-weather-desc {
+        font-size: 1.5rem;
+    }
+    
+    .hero-right-top,
+    .hero-right-bottom {
+        gap: 12px;
+    }
+    
+    .hero-temp-range,
+    .comfort-badge {
+        padding: 12px 14px;
+    }
+    
+    .range-value {
+        font-size: 0.9rem;
+    }
+    
+    .comfort-badge {
+        font-size: 0.95rem;
+    }
+    
+    .advice-card {
+        padding: 14px 12px;
+    }
+    
+    .advice-icon {
+        font-size: 1.6rem;
+    }
+    
+    .advice-text {
+        font-size: 1rem;
     }
     
     .forecast-section {
@@ -653,6 +726,19 @@ body {
     .hero-content {
         padding: 115px 35px 35px;
         max-width: 800px;
+    }
+    
+    /* Hero 兩欄佈局 - 桌面版 */
+    .hero-layout {
+        gap: 40px;
+    }
+    
+    .hero-temp {
+        font-size: 6.5rem;
+    }
+    
+    .hero-emoji {
+        font-size: 5.5rem;
     }
     
     .forecast-section {
@@ -708,6 +794,11 @@ body {
         max-width: 900px;
     }
     
+    /* Hero 兩欄佈局 - 大螢幕版 */
+    .hero-layout {
+        gap: 50px;
+    }
+    
     .hero-temp {
         font-size: 7rem;
     }
@@ -718,6 +809,48 @@ body {
     
     .hero-weather-desc {
         font-size: 1.8rem;
+    }
+    
+    .hero-right {
+        gap: 15px;
+    }
+    
+    .hero-right-top,
+    .hero-right-bottom {
+        gap: 15px;
+    }
+    
+    .hero-temp-range,
+    .comfort-badge {
+        padding: 14px 16px;
+    }
+    
+    .range-icon {
+        font-size: 1.1rem;
+    }
+    
+    .range-value {
+        font-size: 0.95rem;
+    }
+    
+    .comfort-badge {
+        font-size: 1rem;
+    }
+    
+    .advice-card {
+        padding: 16px 14px;
+    }
+    
+    .advice-icon {
+        font-size: 1.8rem;
+    }
+    
+    .advice-text {
+        font-size: 1.1rem;
+    }
+    
+    .advice-detail {
+        font-size: 0.85rem;
     }
     
     .forecast-section {
@@ -797,37 +930,63 @@ body {
         padding: 90px 15px 15px;
     }
     
+    /* Hero 兩欄佈局 - 小手機版 */
+    .hero-layout {
+        gap: 12px;
+    }
+    
     .hero-temp {
-        font-size: 3.5rem;
+        font-size: 3rem;
     }
     
     .hero-emoji {
-        font-size: 2.5rem;
+        font-size: 2.2rem;
     }
     
     .hero-weather-desc {
-        font-size: 1.2rem;
+        font-size: 1rem;
     }
     
-    .hero-temp-range {
-        font-size: 0.85rem;
-        padding: 4px 12px;
-    }
-    
-    .hero-advice {
+    .hero-right {
         gap: 8px;
     }
     
+    .hero-right-top,
+    .hero-right-bottom {
+        gap: 6px;
+    }
+    
+    .hero-temp-range,
+    .comfort-badge {
+        padding: 6px 8px;
+    }
+    
+    .range-icon {
+        font-size: 0.85rem;
+    }
+    
+    .range-value {
+        font-size: 0.7rem;
+    }
+    
+    .comfort-badge {
+        font-size: 0.75rem;
+    }
+    
     .advice-card {
-        padding: 10px 8px;
+        padding: 8px 6px;
     }
     
     .advice-icon {
-        font-size: 1.4rem;
+        font-size: 1.2rem;
     }
     
     .advice-text {
-        font-size: 0.9rem;
+        font-size: 0.8rem;
+    }
+    
+    .advice-detail {
+        font-size: 0.65rem;
     }
     
     .forecast-section {
@@ -920,16 +1079,67 @@ body {
         padding: 85px 10px 15px;
     }
     
+    /* Hero 兩欄佈局 - 極小螢幕版 */
+    .hero-layout {
+        gap: 8px;
+    }
+    
     .hero-temp {
-        font-size: 3rem;
+        font-size: 2.5rem;
     }
     
     .hero-emoji {
-        font-size: 2rem;
+        font-size: 1.8rem;
     }
     
     .hero-temp-display {
         gap: 5px;
+    }
+    
+    .hero-weather-desc {
+        font-size: 0.9rem;
+    }
+    
+    .hero-right {
+        gap: 6px;
+    }
+    
+    .hero-right-top,
+    .hero-right-bottom {
+        gap: 4px;
+    }
+    
+    .hero-temp-range,
+    .comfort-badge {
+        padding: 5px 6px;
+    }
+    
+    .range-icon {
+        font-size: 0.8rem;
+    }
+    
+    .range-value {
+        font-size: 0.65rem;
+    }
+    
+    .comfort-badge {
+        font-size: 0.7rem;
+    }
+    
+    .advice-card {
+        padding: 6px 4px;
+    }
+    
+    .advice-icon {
+        font-size: 1rem;
+    }
+    
+    .advice-text {
+        font-size: 0.7rem;
+    }
+    
+    .advice-detail {
+        font-size: 0.6rem;
     }
     
     .forecast-img-container {
