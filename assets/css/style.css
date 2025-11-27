@@ -193,9 +193,9 @@ body {
 
 .city-btn {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    gap: 2px;
+    gap: 6px;
     padding: 6px 12px;
     background: rgba(255, 255, 255, 0.7);
     border: 2px solid transparent;
@@ -277,7 +277,7 @@ body {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    gap: 20px;
+    gap: 0;
     flex: 1;
     width: 100%;
 }
@@ -490,7 +490,7 @@ body {
     width: 80px;
     height: 80px;
     margin: 0 auto 12px;
-    border-radius: var(--radius-md);
+    border-radius: 50%;
     overflow: hidden;
     box-shadow: var(--shadow-soft);
     background: var(--kawaii-cream);
@@ -644,10 +644,6 @@ body {
     }
     
     /* Hero 兩欄佈局 - 平板版 */
-    .hero-layout {
-        gap: 30px;
-    }
-    
     .hero-temp {
         font-size: 6rem;
     }
@@ -729,10 +725,6 @@ body {
     }
     
     /* Hero 兩欄佈局 - 桌面版 */
-    .hero-layout {
-        gap: 40px;
-    }
-    
     .hero-temp {
         font-size: 6.5rem;
     }
@@ -795,10 +787,6 @@ body {
     }
     
     /* Hero 兩欄佈局 - 大螢幕版 */
-    .hero-layout {
-        gap: 50px;
-    }
-    
     .hero-temp {
         font-size: 7rem;
     }
@@ -931,10 +919,6 @@ body {
     }
     
     /* Hero 兩欄佈局 - 小手機版 */
-    .hero-layout {
-        gap: 12px;
-    }
-    
     .hero-temp {
         font-size: 3rem;
     }
@@ -1080,10 +1064,6 @@ body {
     }
     
     /* Hero 兩欄佈局 - 極小螢幕版 */
-    .hero-layout {
-        gap: 8px;
-    }
-    
     .hero-temp {
         font-size: 2.5rem;
     }

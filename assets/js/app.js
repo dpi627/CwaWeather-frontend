@@ -15,7 +15,7 @@ const CITIES = {
 };
 
 // 當前選擇的城市
-let currentCity = "kaohsiung";
+let currentCity = "taipei";
 
 // ============================================
 // 工具函式
