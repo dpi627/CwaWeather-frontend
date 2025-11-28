@@ -582,6 +582,48 @@ body {
 }
 
 /* ============================================
+   Toast Notification
+   ============================================ */
+
+.toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100px);
+    background: var(--kawaii-white);
+    color: var(--text-dark);
+    padding: 12px 24px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-medium);
+    font-size: 0.9rem;
+    font-weight: 700;
+    z-index: 10000;
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    pointer-events: none;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.toast-success {
+    background: linear-gradient(135deg, var(--kawaii-mint) 0%, var(--ac-green) 100%);
+    color: var(--kawaii-white);
+}
+
+.toast-info {
+    background: linear-gradient(135deg, var(--kawaii-sky) 0%, var(--kawaii-lavender) 100%);
+    color: var(--kawaii-white);
+}
+
+.toast-warning {
+    background: linear-gradient(135deg, var(--kawaii-peach) 0%, var(--kawaii-pink) 100%);
+    color: var(--kawaii-white);
+}
+
+/* ============================================
    No Data State
    ============================================ */
 

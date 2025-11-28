@@ -17,6 +17,16 @@ const CITIES = {
 // 當前選擇的城市
 let currentCity = "taipei";
 
+// 六都經緯度範圍
+const CITY_COORDINATES = {
+    taipei: { lat: [24.95, 25.20], lng: [121.45, 121.65] },
+    newtaipei: { lat: [24.60, 25.30], lng: [121.30, 122.00] },
+    taoyuan: { lat: [24.80, 25.10], lng: [121.10, 121.50] },
+    taichung: { lat: [24.00, 24.35], lng: [120.50, 121.00] },
+    tainan: { lat: [22.85, 23.20], lng: [120.05, 120.50] },
+    kaohsiung: { lat: [22.50, 22.85], lng: [120.20, 120.50] }
+};
+
 // ============================================
 // Playground 設定
 // ============================================
@@ -708,11 +718,95 @@ function renderPlaygroundWeathers() {
 }
 
 // ============================================
+// 地理位置功能
+// ============================================
+
+/**
+ * 顯示 Toast 通知
+ * @param {string} message - 通知訊息
+ * @param {string} type - 類型 ('success' | 'info' | 'warning')
+ */
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    // 觸發動畫
+    setTimeout(() => toast.classList.add('show'), 10);
+    
+    // 3 秒後移除
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+/**
+ * 根據經緯度判斷城市
+ * @param {number} lat - 緯度
+ * @param {number} lng - 經度
+ * @returns {string|null} 城市 key 或 null
+ */
+function getCityFromCoordinates(lat, lng) {
+    for (const [cityKey, bounds] of Object.entries(CITY_COORDINATES)) {
+        if (lat >= bounds.lat[0] && lat <= bounds.lat[1] &&
+            lng >= bounds.lng[0] && lng <= bounds.lng[1]) {
+            return cityKey;
+        }
+    }
+    return null;
+}
+
+/**
+ * 取得使用者地理位置並設定城市
+ */
+function initGeolocation() {
+    if (!navigator.geolocation) {
+        console.log('瀏覽器不支援地理定位');
+        return;
+    }
+    
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            const { latitude, longitude } = position.coords;
+            const detectedCity = getCityFromCoordinates(latitude, longitude);
+            
+            if (detectedCity) {
+                currentCity = detectedCity;
+                showToast(`📍 已定位到${CITIES[detectedCity].name}`, 'success');
+                
+                // 更新城市選擇器的 active 狀態
+                document.querySelectorAll('.city-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.city === detectedCity);
+                });
+            } else {
+                showToast('📍 定位成功，預設顯示臺北市', 'info');
+            }
+            
+            // 載入天氣資料
+            fetchWeather(currentCity);
+        },
+        (error) => {
+            console.log('地理定位失敗:', error.message);
+            showToast('📍 定位失敗，預設顯示臺北市', 'info');
+            
+            // 載入預設城市的天氣資料
+            fetchWeather(currentCity);
+        },
+        {
+            timeout: 5000,
+            maximumAge: 300000 // 5 分鐘快取
+        }
+    );
+}
+
+// ============================================
 // 頁面初始化
 // ============================================
 
 document.addEventListener("DOMContentLoaded", () => {
     initCitySelector();
     initPlayground();
-    fetchWeather(currentCity);
+    initGeolocation(); // 啟動地理定位
 });
