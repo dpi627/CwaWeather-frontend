@@ -266,10 +266,10 @@ function generate3DayFromFallback(data36h) {
  * 
  * CWA API 資料結構說明：
  * F-D0047 系列回傳的是鄉鎮預報，結構為：
- * records → locations[0] → location[] (多個鄉鎮)
+ * records → locations[0] → Location[] (多個鄉鎮)
  * 
  * 後端簡化後回傳：
- * { Locations: location[] }  // 直接是鄉鎮陣列
+ * { Locations: [{ LocationsName, Location: [{locationName, weatherElement}] }] }
  */
 function transform3DayData(rawData) {
     // 驗證資料結構
@@ -278,8 +278,16 @@ function transform3DayData(rawData) {
         throw new Error('資料結構不完整');
     }
     
-    // 取得第一個鄉鎮的資料
-    const firstDistrict = rawData.Locations[0];
+    // 第一層：縣市資料（包含 Location 陣列）
+    const cityData = rawData.Locations[0];
+    
+    if (!cityData || !cityData.Location || !Array.isArray(cityData.Location) || cityData.Location.length === 0) {
+        console.error('縣市資料異常:', cityData);
+        throw new Error('縣市資料不完整');
+    }
+    
+    // 第二層：取第一個鄉鎮的資料
+    const firstDistrict = cityData.Location[0];
     
     if (!firstDistrict || !firstDistrict.locationName || !firstDistrict.weatherElement) {
         console.error('鄉鎮資料異常:', firstDistrict);
