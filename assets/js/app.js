@@ -262,11 +262,30 @@ function generate3DayFromFallback(data36h) {
 
 /**
  * 轉換三日預報 API 資料
- * 取第一個行政區，按日期分組並計算每日極值
+ * 取第一個行政區（鄉鎮），按日期分組並計算每日極值
+ * 
+ * CWA API 資料結構說明：
+ * F-D0047 系列回傳的是鄉鎮預報，結構為：
+ * records → locations[0] → location[] (多個鄉鎮)
+ * 
+ * 後端簡化後回傳：
+ * { Locations: location[] }  // 直接是鄉鎮陣列
  */
 function transform3DayData(rawData) {
-    // 取得第一個行政區的資料
+    // 驗證資料結構
+    if (!rawData || !rawData.Locations || !Array.isArray(rawData.Locations) || rawData.Locations.length === 0) {
+        console.error('三日預報資料結構異常:', rawData);
+        throw new Error('資料結構不完整');
+    }
+    
+    // 取得第一個鄉鎮的資料
     const firstDistrict = rawData.Locations[0];
+    
+    if (!firstDistrict || !firstDistrict.locationName || !firstDistrict.weatherElement) {
+        console.error('鄉鎮資料異常:', firstDistrict);
+        throw new Error('鄉鎮資料不完整');
+    }
+    
     const districtName = firstDistrict.locationName;
     const elements = firstDistrict.weatherElement;
     
@@ -508,6 +527,9 @@ async function fetchWeather(cityKey = currentCity) {
         
         // 等待所有請求完成
         const [_, data36h, data3day] = await Promise.all([delayPromise, fetch36h, fetch3day]);
+        
+        console.log('API 回應 - 36小時:', data36h);
+        console.log('API 回應 - 三日:', data3day);
         
         if (!data36h.success) {
             throw new Error("36小時預報 API 錯誤");
