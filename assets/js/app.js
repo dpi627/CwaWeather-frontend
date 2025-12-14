@@ -266,7 +266,7 @@ function generate3DayFromFallback(data36h) {
  */
 function transform3DayData(rawData) {
     // 取得第一個行政區的資料
-    const locations = rawData.locations;
+    const locations = rawData.Locations;
     const firstDistrict = locations.location[0];
     const districtName = firstDistrict.locationName;
     const elements = firstDistrict.weatherElement;
